@@ -1,0 +1,233 @@
+[
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "title": "Computers",
+      "image_src": "/static/frontend/assets/img/content/home/videoca.png",
+      "image_alt": "Computers",
+      "parent": null
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+      "title": "Smartphones",
+      "image_src": "/static/frontend/assets/img/content/home/bigGoods.png",
+      "image_alt": "Smartphones",
+      "parent": null
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 3,
+    "fields": {
+      "title": "Video cards",
+      "image_src": "/static/frontend/assets/img/content/home/card.jpg",
+      "image_alt": "Video cards",
+      "parent": 1
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 4,
+    "fields": {
+      "title": "Laptops",
+      "image_src": "/static/frontend/assets/img/content/home/slider.png",
+      "image_alt": "Laptops",
+      "parent": 1
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 5,
+    "fields": {
+      "title": "Android phones",
+      "image_src": "/static/frontend/assets/img/content/home/bigGoods.png",
+      "image_alt": "Android phones",
+      "parent": 2
+    }
+  },
+  {
+    "model": "catalog.tag",
+    "pk": 1,
+    "fields": {
+      "name": "Gaming"
+    }
+  },
+  {
+    "model": "catalog.tag",
+    "pk": 2,
+    "fields": {
+      "name": "Office"
+    }
+  },
+  {
+    "model": "catalog.tag",
+    "pk": 3,
+    "fields": {
+      "name": "Portable"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+      "category": 3,
+      "title": "MSI GeForce RTX 4070",
+      "description": "<p>Powerful GPU for modern games.</p>",
+      "full_description": "<p>12GB GDDR6X, DLSS 3 support, and efficient cooling.</p>",
+      "price": "67990.00",
+      "count": 12,
+      "created_at": "2026-01-15T10:00:00Z",
+      "free_delivery": true,
+      "rating": "4.80",
+      "tags": [1]
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+      "category": 4,
+      "title": "Lenovo IdeaPad 5",
+      "description": "<p>Balanced laptop for work and study.</p>",
+      "full_description": "<p>AMD Ryzen 7, 16GB RAM, 512GB SSD.</p>",
+      "price": "74990.00",
+      "count": 7,
+      "created_at": "2026-01-20T11:30:00Z",
+      "free_delivery": true,
+      "rating": "4.40",
+      "tags": [2, 3]
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+      "category": 5,
+      "title": "Samsung Galaxy A55",
+      "description": "<p>Mid-range smartphone with AMOLED display.</p>",
+      "full_description": "<p>8GB RAM, 256GB storage, 5000mAh battery.</p>",
+      "price": "39990.00",
+      "count": 0,
+      "created_at": "2026-01-11T08:45:00Z",
+      "free_delivery": false,
+      "rating": "4.20",
+      "tags": [3]
+    }
+  },
+  {
+    "model": "catalog.productimage",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "src": "/static/frontend/assets/img/content/home/videoca.png",
+      "alt": "RTX 4070",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "catalog.productimage",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "src": "/static/frontend/assets/img/content/home/card.jpg",
+      "alt": "RTX side",
+      "sort_order": 1
+    }
+  },
+  {
+    "model": "catalog.productimage",
+    "pk": 3,
+    "fields": {
+      "product": 2,
+      "src": "/static/frontend/assets/img/content/home/slider.png",
+      "alt": "IdeaPad 5",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "catalog.productimage",
+    "pk": 4,
+    "fields": {
+      "product": 3,
+      "src": "/static/frontend/assets/img/content/home/bigGoods.png",
+      "alt": "Galaxy A55",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "catalog.review",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "author": "Alex",
+      "email": "alex@example.com",
+      "text": "Great performance in games.",
+      "rate": 5,
+      "created_at": "2026-02-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.review",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "author": "Ira",
+      "email": "ira@example.com",
+      "text": "Quiet and cool under load.",
+      "rate": 4,
+      "created_at": "2026-02-03T13:10:00Z"
+    }
+  },
+  {
+    "model": "catalog.review",
+    "pk": 3,
+    "fields": {
+      "product": 2,
+      "author": "Max",
+      "email": "max@example.com",
+      "text": "Solid everyday laptop.",
+      "rate": 4,
+      "created_at": "2026-02-02T15:30:00Z"
+    }
+  },
+  {
+    "model": "catalog.specification",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "name": "Memory",
+      "value": "12GB"
+    }
+  },
+  {
+    "model": "catalog.specification",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "name": "Chipset",
+      "value": "NVIDIA RTX 4070"
+    }
+  },
+  {
+    "model": "catalog.specification",
+    "pk": 3,
+    "fields": {
+      "product": 2,
+      "name": "RAM",
+      "value": "16GB"
+    }
+  },
+  {
+    "model": "catalog.specification",
+    "pk": 4,
+    "fields": {
+      "product": 3,
+      "name": "Battery",
+      "value": "5000mAh"
+    }
+  }
+]

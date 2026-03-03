@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'frontend',
     'api',
+    'catalog',
 ]
 
 MIDDLEWARE = [
