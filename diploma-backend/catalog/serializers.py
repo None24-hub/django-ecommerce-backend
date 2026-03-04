@@ -105,6 +105,30 @@ class ProductFullSerializer(serializers.ModelSerializer):
         return float(value or 0)
 
 
+class SaleItemSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+    salePrice = serializers.DecimalField(
+        source="sale_price",
+        max_digits=10,
+        decimal_places=2,
+    )
+    dateFrom = serializers.DateField(source="sale_date_from", format="%m-%d")
+    dateTo = serializers.DateField(source="sale_date_to", format="%m-%d")
+    images = ImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "price",
+            "salePrice",
+            "dateFrom",
+            "dateTo",
+            "title",
+            "images",
+        )
+
+
 class CategoryBaseSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 

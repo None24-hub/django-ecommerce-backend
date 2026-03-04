@@ -46,6 +46,17 @@ class Product(models.Model):
     created_at = models.DateTimeField(default=timezone.now, db_index=True)
     free_delivery = models.BooleanField(default=False)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    is_popular = models.BooleanField(default=False)
+    is_limited = models.BooleanField(default=False)
+    is_banner = models.BooleanField(default=False)
+    sale_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    sale_date_from = models.DateField(null=True, blank=True)
+    sale_date_to = models.DateField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, related_name="products", blank=True)
 
     class Meta:
