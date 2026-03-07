@@ -1,16 +1,33 @@
-from django.urls import path
+from django.urls import re_path
 
-from catalog.views import CatalogListAPIView, CategoriesListAPIView, ProductDetailAPIView
+from catalog.views import (
+    BannersAPIView,
+    CatalogListAPIView,
+    CategoriesListAPIView,
+    LimitedProductsAPIView,
+    PopularProductsAPIView,
+    ProductDetailAPIView,
+    SalesAPIView,
+)
 
 urlpatterns = [
-    path("categories", CategoriesListAPIView.as_view(), name="categories-list"),
-    path("categories/", CategoriesListAPIView.as_view(), name="categories-list-slash"),
-    path("catalog", CatalogListAPIView.as_view(), name="catalog-list"),
-    path("catalog/", CatalogListAPIView.as_view(), name="catalog-list-slash"),
-    path("product/<int:product_id>", ProductDetailAPIView.as_view(), name="product-detail"),
-    path(
-        "product/<int:product_id>/",
+    re_path(r"^categories/?$", CategoriesListAPIView.as_view(), name="categories-list"),
+    re_path(r"^catalog/?$", CatalogListAPIView.as_view(), name="catalog-list"),
+    re_path(
+        r"^products/popular/?$",
+        PopularProductsAPIView.as_view(),
+        name="products-popular",
+    ),
+    re_path(
+        r"^products/limited/?$",
+        LimitedProductsAPIView.as_view(),
+        name="products-limited",
+    ),
+    re_path(r"^banners/?$", BannersAPIView.as_view(), name="banners"),
+    re_path(r"^sales/?$", SalesAPIView.as_view(), name="sales"),
+    re_path(
+        r"^product/(?P<product_id>\d+)/?$",
         ProductDetailAPIView.as_view(),
-        name="product-detail-slash",
+        name="product-detail",
     ),
 ]

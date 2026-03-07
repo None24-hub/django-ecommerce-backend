@@ -7,7 +7,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalog.models import Category, Product, ProductImage, Review, Specification, Tag
-from catalog.serializers import CategorySerializer, ProductFullSerializer, ProductShortSerializer
+from catalog.serializers import (
+    CategorySerializer,
+    ProductFullSerializer,
+    ProductShortSerializer,
+    SaleItemSerializer,
+)
 
 
 def _to_bool(raw_value):
@@ -33,6 +38,75 @@ def _to_float(raw_value):
         return float(raw_value)
     except (TypeError, ValueError):
         return None
+
+
+def _product_short_queryset():
+    return (
+        Product.objects.select_related("category")
+        .only(
+            "id",
+            "category_id",
+            "title",
+            "description",
+            "price",
+            "count",
+            "created_at",
+            "free_delivery",
+            "rating",
+        )
+        .prefetch_related(
+            Prefetch(
+                "images",
+                queryset=ProductImage.objects.only(
+                    "id",
+                    "product_id",
+                    "src",
+                    "alt",
+                    "sort_order",
+                ).order_by("sort_order", "id"),
+            ),
+            Prefetch("tags", queryset=Tag.objects.only("id", "name")),
+        )
+        .annotate(
+            reviews_count=Count("reviews", distinct=True),
+            rating_value=Coalesce(
+                Avg("reviews__rate"),
+                F("rating"),
+                Value(0.0),
+                output_field=FloatField(),
+            ),
+        )
+    )
+
+
+def _sales_queryset():
+    return (
+        Product.objects.filter(
+            sale_price__isnull=False,
+            sale_date_from__isnull=False,
+            sale_date_to__isnull=False,
+        )
+        .only(
+            "id",
+            "title",
+            "price",
+            "sale_price",
+            "sale_date_from",
+            "sale_date_to",
+        )
+        .prefetch_related(
+            Prefetch(
+                "images",
+                queryset=ProductImage.objects.only(
+                    "id",
+                    "product_id",
+                    "src",
+                    "alt",
+                    "sort_order",
+                ).order_by("sort_order", "id"),
+            ),
+        )
+    )
 
 
 class CategoriesListAPIView(APIView):
@@ -64,42 +138,7 @@ class CatalogListAPIView(APIView):
     def get(self, request):
         query_params = request.query_params
 
-        products = (
-            Product.objects.select_related("category")
-            .only(
-                "id",
-                "category_id",
-                "title",
-                "description",
-                "price",
-                "count",
-                "created_at",
-                "free_delivery",
-                "rating",
-            )
-            .prefetch_related(
-                Prefetch(
-                    "images",
-                    queryset=ProductImage.objects.only(
-                        "id",
-                        "product_id",
-                        "src",
-                        "alt",
-                        "sort_order",
-                    ).order_by("sort_order", "id"),
-                ),
-                Prefetch("tags", queryset=Tag.objects.only("id", "name")),
-            )
-            .annotate(
-                reviews_count=Count("reviews", distinct=True),
-                rating_value=Coalesce(
-                    Avg("reviews__rate"),
-                    F("rating"),
-                    Value(0.0),
-                    output_field=FloatField(),
-                ),
-            )
-        )
+        products = _product_short_queryset()
 
         text_filter = query_params.get("filter[name]") or query_params.get("filter")
         if text_filter:
@@ -222,3 +261,58 @@ class ProductDetailAPIView(APIView):
         product = get_object_or_404(product_qs, id=product_id)
         serializer = ProductFullSerializer(product)
         return Response(serializer.data)
+
+
+class PopularProductsAPIView(APIView):
+    def get(self, request):
+        products = _product_short_queryset().filter(is_popular=True).order_by(
+            "-rating_value",
+            "-reviews_count",
+            "-id",
+        )
+        serializer = ProductShortSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class LimitedProductsAPIView(APIView):
+    def get(self, request):
+        products = _product_short_queryset().filter(is_limited=True).order_by(
+            "-created_at",
+            "-id",
+        )
+        serializer = ProductShortSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class BannersAPIView(APIView):
+    def get(self, request):
+        products = _product_short_queryset().filter(is_banner=True).order_by(
+            "-created_at",
+            "-id",
+        )
+        serializer = ProductShortSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class SalesAPIView(APIView):
+    PAGE_SIZE = 20
+
+    def get(self, request):
+        current_page = max(_to_int(request.query_params.get("currentPage"), 1), 1)
+        products = _sales_queryset().order_by("-sale_date_from", "-id")
+
+        total = products.count()
+        last_page = max(math.ceil(total / self.PAGE_SIZE), 1)
+        current_page = min(current_page, last_page)
+
+        start = (current_page - 1) * self.PAGE_SIZE
+        end = start + self.PAGE_SIZE
+        serializer = SaleItemSerializer(products[start:end], many=True)
+
+        return Response(
+            {
+                "items": serializer.data,
+                "currentPage": current_page,
+                "lastPage": last_page,
+            }
+        )

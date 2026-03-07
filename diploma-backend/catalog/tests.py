@@ -17,6 +17,12 @@ class CatalogApiTests(APITestCase):
             count=3,
             free_delivery=True,
             rating=3.5,
+            is_popular=True,
+            is_limited=True,
+            is_banner=True,
+            sale_price=900,
+            sale_date_from=timezone.now().date() - timezone.timedelta(days=3),
+            sale_date_to=timezone.now().date() + timezone.timedelta(days=7),
             created_at=timezone.now() - timezone.timedelta(days=2),
         )
         self.second = Product.objects.create(
@@ -28,6 +34,7 @@ class CatalogApiTests(APITestCase):
             count=1,
             free_delivery=False,
             rating=4.5,
+            is_popular=True,
             created_at=timezone.now() - timezone.timedelta(days=1),
         )
         self.third = Product.objects.create(
@@ -39,6 +46,11 @@ class CatalogApiTests(APITestCase):
             count=0,
             free_delivery=True,
             rating=2.0,
+            is_limited=True,
+            is_banner=True,
+            sale_price=1200,
+            sale_date_from=timezone.now().date() - timezone.timedelta(days=1),
+            sale_date_to=timezone.now().date() + timezone.timedelta(days=10),
             created_at=timezone.now(),
         )
 
@@ -93,3 +105,29 @@ class CatalogApiTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         product_ids = [item["id"] for item in response.data["items"]]
         self.assertEqual(product_ids, [self.second.id, self.first.id, self.third.id])
+
+    def test_popular_products_showcase(self):
+        response = self.client.get("/api/products/popular")
+        self.assertEqual(response.status_code, 200)
+        product_ids = [item["id"] for item in response.data]
+        self.assertEqual(product_ids, [self.first.id, self.second.id])
+
+    def test_limited_products_showcase(self):
+        response = self.client.get("/api/products/limited")
+        self.assertEqual(response.status_code, 200)
+        product_ids = [item["id"] for item in response.data]
+        self.assertEqual(product_ids, [self.third.id, self.first.id])
+
+    def test_banners_showcase(self):
+        response = self.client.get("/api/banners")
+        self.assertEqual(response.status_code, 200)
+        product_ids = [item["id"] for item in response.data]
+        self.assertEqual(product_ids, [self.third.id, self.first.id])
+
+    def test_sales_showcase(self):
+        response = self.client.get("/api/sales", {"currentPage": 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.data.keys()), {"items", "currentPage", "lastPage"})
+        self.assertEqual(response.data["currentPage"], 1)
+        sale_ids = [item["id"] for item in response.data["items"]]
+        self.assertEqual(sale_ids, [str(self.third.id), str(self.first.id)])
