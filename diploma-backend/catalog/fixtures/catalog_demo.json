@@ -244,8 +244,8 @@
     "pk": 3,
     "fields": {
       "product": 2,
-      "src": "/static/frontend/assets/img/content/home/slider.png",
-      "alt": "IdeaPad 5",
+      "src": "/static/frontend/assets/img/content/sale/product.png",
+      "alt": "Lenovo IdeaPad 5 laptop",
       "sort_order": 0
     }
   },
@@ -254,8 +254,8 @@
     "pk": 4,
     "fields": {
       "product": 3,
-      "src": "/static/frontend/assets/img/content/home/bigGoods.png",
-      "alt": "Galaxy A55",
+      "src": "/static/frontend/assets/img/content/sale/product.png",
+      "alt": "Samsung Galaxy A55 smartphone",
       "sort_order": 0
     }
   },
@@ -264,8 +264,8 @@
     "pk": 5,
     "fields": {
       "product": 4,
-      "src": "/static/frontend/assets/img/content/home/card.jpg",
-      "alt": "ASUS TUF",
+      "src": "/static/frontend/assets/img/content/sale/product.png",
+      "alt": "ASUS TUF Gaming A15 laptop",
       "sort_order": 0
     }
   },
@@ -274,7 +274,7 @@
     "pk": 6,
     "fields": {
       "product": 5,
-      "src": "/static/frontend/assets/img/content/home/bigGoods.png",
+      "src": "/static/frontend/assets/img/content/sale/product.png",
       "alt": "iPhone 15",
       "sort_order": 0
     }
@@ -284,8 +284,8 @@
     "pk": 7,
     "fields": {
       "product": 6,
-      "src": "/static/frontend/assets/img/content/home/slider.png",
-      "alt": "MacBook Air",
+      "src": "/static/frontend/assets/img/content/sale/product.png",
+      "alt": "MacBook Air 13 laptop",
       "sort_order": 0
     }
   },
