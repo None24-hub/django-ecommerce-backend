@@ -1,6 +1,7 @@
 import json
+import os
 import shutil
-import tempfile
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.test import override_settings
@@ -10,7 +11,8 @@ from rest_framework.test import APITestCase
 from accounts.services import get_or_create_profile
 
 User = get_user_model()
-TEST_MEDIA_ROOT = tempfile.mkdtemp(prefix="megano-test-media-")
+TEST_MEDIA_ROOT = Path(__file__).resolve().parent / "test_media"
+TEST_MEDIA_ROOT.mkdir(exist_ok=True)
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
@@ -94,18 +96,39 @@ class AccountsApiTests(APITestCase):
 
     def test_avatar_upload_and_size_limit(self):
         user = User.objects.create_user(username="avatar_user", password="12345678")
-        get_or_create_profile(user)
+        profile = get_or_create_profile(user)
         self.client.login(username="avatar_user", password="12345678")
 
-        avatar = SimpleUploadedFile(
+        first_avatar = SimpleUploadedFile(
             "avatar.png",
             b"\x89PNG\r\n\x1a\nsmall-image",
             content_type="image/png",
         )
-        response = self.client.post("/api/profile/avatar", data={"avatar": avatar})
+        response = self.client.post("/api/profile/avatar", data={"avatar": first_avatar})
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.data["avatar"])
         self.assertTrue(response.data["avatar"]["src"].startswith("/media/avatars/"))
+        profile.refresh_from_db()
+        old_file_path = profile.avatar.path
+        self.assertTrue(os.path.exists(old_file_path))
+
+        second_avatar = SimpleUploadedFile(
+            "avatar-new.png",
+            b"\x89PNG\r\n\x1a\nanother-small-image",
+            content_type="image/png",
+        )
+        with self.captureOnCommitCallbacks(execute=True):
+            second_response = self.client.post(
+                "/api/profile/avatar",
+                data={"avatar": second_avatar},
+            )
+        self.assertEqual(second_response.status_code, 200)
+
+        profile.refresh_from_db()
+        self.assertTrue(profile.avatar.name.endswith("avatar-new.png"))
+        self.assertNotEqual(profile.avatar.path, old_file_path)
+        self.assertFalse(os.path.exists(old_file_path))
+        self.assertTrue(os.path.exists(profile.avatar.path))
 
         large_avatar = SimpleUploadedFile(
             "large.png",
