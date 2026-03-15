@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'api',
     'catalog',
     'accounts',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
