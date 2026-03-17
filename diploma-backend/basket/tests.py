@@ -1,8 +1,12 @@
 import json
 
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 
+from basket.models import BasketItem
 from catalog.models import Category, Product, ProductImage
+
+User = get_user_model()
 
 
 class BasketSessionApiTests(APITestCase):
@@ -109,3 +113,83 @@ class BasketSessionApiTests(APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_authenticated_basket_add_update_remove_and_clear(self):
+        user = User.objects.create_user(username="basket_user", password="12345678")
+        self.client.login(username="basket_user", password="12345678")
+
+        response = self.client.post(
+            "/api/basket",
+            data={"id": self.product_1.id, "count": 2},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self._get_item(response.data, self.product_1.id)["count"], 2)
+        self.assertEqual(
+            BasketItem.objects.get(basket__user=user, product_id=self.product_1.id).count,
+            2,
+        )
+
+        response = self.client.post(
+            "/api/basket",
+            data={"id": self.product_1.id, "count": 3},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self._get_item(response.data, self.product_1.id)["count"], 5)
+
+        response = self.client.post(
+            "/api/basket",
+            data={"id": self.product_2.id, "count": 1},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(self._get_item(response.data, self.product_2.id)["count"], 1)
+
+        response = self.client.delete(
+            "/api/basket",
+            data=json.dumps({"id": self.product_1.id, "count": 2}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self._get_item(response.data, self.product_1.id)["count"], 3)
+
+        response = self.client.delete(
+            "/api/basket",
+            data=json.dumps({"id": self.product_1.id, "count": 10}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.product_2.id)
+
+        response = self.client.delete(
+            "/api/basket",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+        self.assertFalse(BasketItem.objects.filter(basket__user=user).exists())
+
+    def test_session_basket_merged_into_db_on_first_auth_request(self):
+        user = User.objects.create_user(username="merge_user", password="12345678")
+
+        self.client.post(
+            "/api/basket",
+            data={"id": self.product_1.id, "count": 2},
+            format="json",
+        )
+        self.assertEqual(self.client.session["basket_items"], {str(self.product_1.id): 2})
+
+        self.client.login(username="merge_user", password="12345678")
+        response = self.client.get("/api/basket")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self._get_item(response.data, self.product_1.id)["count"], 2)
+
+        self.assertEqual(self.client.session.get("basket_items"), {})
+        self.assertEqual(
+            BasketItem.objects.get(basket__user=user, product_id=self.product_1.id).count,
+            2,
+        )
