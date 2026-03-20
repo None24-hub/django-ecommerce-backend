@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'catalog',
     'accounts',
     'basket',
+    'orders',
     'django_cleanup.apps.CleanupConfig',
 ]
 

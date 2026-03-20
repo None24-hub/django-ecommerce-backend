@@ -6,5 +6,6 @@ urlpatterns = [
     path("health/", HealthCheckAPIView.as_view(), name="health"),
     path("", include("accounts.urls")),
     path("", include("basket.urls")),
+    path("", include("orders.urls")),
     path("", include("catalog.urls")),
 ]
