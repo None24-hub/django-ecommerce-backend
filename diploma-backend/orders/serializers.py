@@ -47,6 +47,7 @@ class OrderSerializer(serializers.ModelSerializer):
     deliveryType = serializers.CharField(source="delivery_type")
     paymentType = serializers.CharField(source="payment_type")
     totalCost = serializers.DecimalField(source="total_cost", max_digits=12, decimal_places=2)
+    paymentError = serializers.SerializerMethodField()
     products = OrderItemSerializer(source="items", many=True, read_only=True)
 
     class Meta:
@@ -61,7 +62,16 @@ class OrderSerializer(serializers.ModelSerializer):
             "paymentType",
             "totalCost",
             "status",
+            "paymentError",
             "city",
             "address",
             "products",
         )
+
+    def get_paymentError(self, obj):
+        payment = getattr(obj, "payment", None)
+        if payment is None:
+            return None
+        if payment.status != "failed":
+            return None
+        return payment.error_message or "Payment was declined."
