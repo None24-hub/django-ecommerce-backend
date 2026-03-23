@@ -1,0 +1,54 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1001,
+    "fields": {
+      "password": "pbkdf2_sha256$1200000$61t3CY1QL975eH5n6Owq4V$IBNQD6jehrLFf4c9D1662uNa3A2vseMrxRXdh+LCK2Q=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@megano.local",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-03-24T00:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1002,
+    "fields": {
+      "password": "pbkdf2_sha256$1200000$IhRUH8YuXKF05VxCE2rEDk$xIySyqDtQ0hTjuYk8LxRAb7zPD6TV3NMk6CgSZmISXg=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "user",
+      "first_name": "",
+      "last_name": "",
+      "email": "user@megano.local",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-03-24T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.userprofile",
+    "pk": 1001,
+    "fields": {
+      "user": 1001,
+      "full_name": "Admin User",
+      "phone": "+70000000001",
+      "avatar": ""
+    }
+  },
+  {
+    "model": "accounts.userprofile",
+    "pk": 1002,
+    "fields": {
+      "user": 1002,
+      "full_name": "Demo Buyer",
+      "phone": "+70000000002",
+      "avatar": ""
+    }
+  }
+]
