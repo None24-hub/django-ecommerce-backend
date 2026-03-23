@@ -108,7 +108,7 @@ class OrdersAPIView(APIView):
 
     def _get_accessible_orders_queryset(self, request):
         base_qs = (
-            Order.objects.select_related("user")
+            Order.objects.select_related("user", "payment")
             .only(
                 "id",
                 "user_id",
@@ -122,6 +122,9 @@ class OrdersAPIView(APIView):
                 "city",
                 "address",
                 "created_at",
+                "payment__id",
+                "payment__status",
+                "payment__error_message",
             )
             .prefetch_related(
                 Prefetch(
@@ -228,7 +231,7 @@ class OrderDetailAPIView(APIView):
             allowed_q &= Q(id__in=[value for value in order_ids if isinstance(value, int)])
 
         queryset = (
-            Order.objects.select_related("user")
+            Order.objects.select_related("user", "payment")
             .only(
                 "id",
                 "user_id",
@@ -242,6 +245,9 @@ class OrderDetailAPIView(APIView):
                 "city",
                 "address",
                 "created_at",
+                "payment__id",
+                "payment__status",
+                "payment__error_message",
             )
             .prefetch_related(
                 Prefetch(
